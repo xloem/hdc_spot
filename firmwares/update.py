@@ -1,25 +1,17 @@
 #!/usr/bin/env python3
 import os
-import certifi, functools, ssl, urllib.request
-os.environ['SSL_CERT_FILE'] = certifi.where()
-#import pdb; pdb.set_trace()
-#urllib.request.urlopen = functools.partial(
-#    urllib.request.urlopen,
-#    context=ssl.create_default_context(cafile=certifi.where()),
-#)#SSLContext(ssl.PROTOCOL_TLS_CLIENT))
-#__urlopen = urllib.request.urlopen
-#urllib.request.urlopen = lambda *params, **kwparams: __urlopen(
-#    *params, **kwparams,
-#    context=ssl.create_defaultSSLContext(ssl.PROTOCOL_SSLv23)#ssl.PROTOCOL_TLS_CLIENT)
-#)
-urllib.request.urlopen('https://play.google.com/')
+import ssl, urllib.request
 import datalad.support.annexrepo, google_play_scraper, requests, tqdm
 
 requests = requests.Session()
 
-
-VERS=[google_play_scraper.app('com.hivemapper.companion')['version'], 'testing']
-#except urllib.error.URLError as e:
+try:
+    VERS=[google_play_scraper.app('com.hivemapper.companion')['version'], 'testing']
+except urllib.error.URLError as e:
+    if isinstance(e.reason, ssl.SSLCertVerificationError):
+        import certifi
+        os.environ['SSL_CERT_FILE'] = certifi.where()
+        VERS=[google_play_scraper.app('com.hivemapper.companion')['version'], 'testing']
 #    # please send this section to a therapist?
 #    if isinstance(e.reason, ssl.SSLCertVerificationError):
 #        print('Author of this software was victim of mind control and unsure how to handle this error:')
