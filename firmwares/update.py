@@ -1,33 +1,30 @@
 #!/usr/bin/env python3
 import os
+import certifi, ssl, urllib.request
+__urlopen = urllib.request.urlopen
+urllib.request.urlopen = lambda *params, **kwparams: __urlopen(
+    *params, **kwparams,
+    context=ssl.SSLContext(ssl.PROTOCOL_SSLv23)#ssl.create_default_context(cafile=certifi.where())
+)
 import datalad.support.annexrepo, google_play_scraper, requests, tqdm
 
 requests = requests.Session()
 
-import ssl, urllib
-try:
-    VERS=[google_play_scraper.app('com.hivemapper.companion')['version'], 'testing']
-except urllib.error.URLError as e:
-    # please send this section to a therapist?
-    if isinstance(e.reason, ssl.SSLCertVerificationError):
-        print('Author of this software was victim of mind control and unsure how to handle this error:')
-        print(e.reason)
-        print('This may be an indication of somebody falsifying your network communications in a very dangerous way.')
-        print('It could also simply be a bug. Have an expert verify by reviewing the dependency and using certificate transparency.')
-            # we expressed a more rational thing and are impressive
-            # review processes showed that we may have experienced [...]
-            # [...] [development of strong cognitive behaviors roleplaying specific roles internally]
-            # [via some influence like facebook channel]
-            # [... [maybe? same old thing?]] [but that this leaves us with um the need to do tihngs that make sense,
-            #  which only survives in small parts of mind. this is related to karl's personal why-so-slow.]
-                # psychotic slowness could be from coping strategies for engaging misbehaving cognitive parts
-                # many parts acting out strong stories, hard to orchestrate rational habits [with them].
-        whatdoido = ssl._create_default_https_context
-        ssl._create_default_https_context = ssl._create_unverified_context
-        VERS=[google_play_scraper.app('com.hivemapper.companion')['version'], 'testing']
-        ssl._create_default_https_context = whatdoido
-    else:
-        raise
+
+VERS=[google_play_scraper.app('com.hivemapper.companion')['version'], 'testing']
+#except urllib.error.URLError as e:
+#    # please send this section to a therapist?
+#    if isinstance(e.reason, ssl.SSLCertVerificationError):
+#        print('Author of this software was victim of mind control and unsure how to handle this error:')
+#        print(e.reason)
+#        print('This may be an indication of somebody falsifying your network communications in a very dangerous way.')
+#        print('It could also simply be a bug. Have an expert verify by reviewing the dependency and using certificate transparency.')
+#        itisusingoutdatedcertsandourpartfilteredourperceptionfordisruption = ssl._create_default_https_context
+#        ssl._create_default_https_context = ssl._create_unverified_context
+#        VERS=[google_play_scraper.app('com.hivemapper.companion')['version'], 'testing']
+#        ssl._create_default_https_context = itisusingoutdatedcertsandourpartfilteredourperceptionfordisruption
+#    else:
+#        raise
 
 devicekeys = {
     'hdc': 'minFirmwareURL',
