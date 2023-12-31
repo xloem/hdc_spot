@@ -29,12 +29,6 @@ urls = set([json[urlkey] for json in jsons.values() for urlkey in devicekeys.val
 for url in urls:
     print('Considering', url)
     _, fn = url.rsplit('/',1)
-    #response = requests.get(url, stream=True)
-    #with open(fn, 'wb') as f, tqdm.tqdm(total=int(response.headers['Content-Length']),desc=fn,unit='B',unit_scale=True,unit_divisor=1024) as pbar:
-    #    for chunk in response.iter_content(chunk_size=1024*1024*4):
-    #        f.write(chunk)
-    #        pbar.update(len(chunk))
-    #repo.add([fn])
     repo.add_url_to_file(os.path.abspath(fn), url, unlink_existing=True)
     added = set()
     for platform, json in jsons.items():
