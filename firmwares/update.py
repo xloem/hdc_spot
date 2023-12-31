@@ -1,11 +1,17 @@
 #!/usr/bin/env python3
 import os
-import certifi, ssl, urllib.request
-__urlopen = urllib.request.urlopen
-urllib.request.urlopen = lambda *params, **kwparams: __urlopen(
-    *params, **kwparams,
-    context=ssl.SSLContext(ssl.PROTOCOL_SSLv23)#ssl.create_default_context(cafile=certifi.where())
-)
+import certifi, functools, ssl, urllib.request
+#import pdb; pdb.set_trace()
+urllib.request.urlopen = functools.partial(
+    urllib.request.urlopen,
+    context=ssl.create_default_context(cafile=certifi.where()),
+)#SSLContext(ssl.PROTOCOL_TLS_CLIENT))
+#__urlopen = urllib.request.urlopen
+#urllib.request.urlopen = lambda *params, **kwparams: __urlopen(
+#    *params, **kwparams,
+#    context=ssl.create_defaultSSLContext(ssl.PROTOCOL_SSLv23)#ssl.PROTOCOL_TLS_CLIENT)
+#)
+urllib.request.urlopen('https://play.google.com/')
 import datalad.support.annexrepo, google_play_scraper, requests, tqdm
 
 requests = requests.Session()
