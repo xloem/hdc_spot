@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 import os
 import certifi, functools, ssl, urllib.request
+os.environ['SSL_CERT_FILE'] = certifi.where()
 #import pdb; pdb.set_trace()
-urllib.request.urlopen = functools.partial(
-    urllib.request.urlopen,
-    context=ssl.create_default_context(cafile=certifi.where()),
-)#SSLContext(ssl.PROTOCOL_TLS_CLIENT))
+#urllib.request.urlopen = functools.partial(
+#    urllib.request.urlopen,
+#    context=ssl.create_default_context(cafile=certifi.where()),
+#)#SSLContext(ssl.PROTOCOL_TLS_CLIENT))
 #__urlopen = urllib.request.urlopen
 #urllib.request.urlopen = lambda *params, **kwparams: __urlopen(
 #    *params, **kwparams,
