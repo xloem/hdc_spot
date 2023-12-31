@@ -1,39 +1,27 @@
 #!/usr/bin/env python3
-import os
-import ssl, urllib.request
-import datalad.support.annexrepo, google_play_scraper, requests, tqdm
-
-requests = requests.Session()
-
-try:
-    VERS=[google_play_scraper.app('com.hivemapper.companion')['version'], 'testing']
-except urllib.error.URLError as e:
-    if isinstance(e.reason, ssl.SSLCertVerificationError):
-        import certifi
-        os.environ['SSL_CERT_FILE'] = certifi.where()
-        VERS=[google_play_scraper.app('com.hivemapper.companion')['version'], 'testing']
-#    # please send this section to a therapist?
-#    if isinstance(e.reason, ssl.SSLCertVerificationError):
-#        print('Author of this software was victim of mind control and unsure how to handle this error:')
-#        print(e.reason)
-#        print('This may be an indication of somebody falsifying your network communications in a very dangerous way.')
-#        print('It could also simply be a bug. Have an expert verify by reviewing the dependency and using certificate transparency.')
-#        itisusingoutdatedcertsandourpartfilteredourperceptionfordisruption = ssl._create_default_https_context
-#        ssl._create_default_https_context = ssl._create_unverified_context
-#        VERS=[google_play_scraper.app('com.hivemapper.companion')['version'], 'testing']
-#        ssl._create_default_https_context = itisusingoutdatedcertsandourpartfilteredourperceptionfordisruption
-#    else:
-#        raise
+import json, os, urllib.request
+import datalad.support.annexrepo, google_play_scraper, tqdm
 
 devicekeys = {
     'hdc': 'minFirmwareURL',
     'hdc-s': 'minFirmwareURLHdcS',
 }
+try:
+    VERS=[google_play_scraper.app('com.hivemapper.companion')['version'], 'testing']
+except urllib.error.URLError as e:
+    import ssl
+    if isinstance(e.reason, ssl.SSLCertVerificationError):
+        import certifi
+        os.environ['SSL_CERT_FILE'] = certifi.where()
+        VERS=[google_play_scraper.app('com.hivemapper.companion')['version'], 'testing']
+
 repo = datalad.support.annexrepo.AnnexRepo('..')
 jsons = {
     f'{platform}-{VER}':
-        requests.get(f'https://hivemapper.com:8443/defaultflags?platform={platform}&app_version={VER}')
-            .json()['flags']
+        json.load(urllib.request.urlopen(urllib.request.Request(
+            f'https://hivemapper.com:8443/defaultflags?platform={platform}&app_version={VER}',
+            headers={'User-Agent':'hdc_spot'},
+        )))['flags']
     for platform in ['Android','iOS']
     for VER in VERS
 }
@@ -41,7 +29,7 @@ urls = set([json[urlkey] for json in jsons.values() for urlkey in devicekeys.val
 for url in urls:
     print('Considering', url)
     _, fn = url.rsplit('/',1)
-    response = requests.get(url, stream=True)
+    #response = requests.get(url, stream=True)
     #with open(fn, 'wb') as f, tqdm.tqdm(total=int(response.headers['Content-Length']),desc=fn,unit='B',unit_scale=True,unit_divisor=1024) as pbar:
     #    for chunk in response.iter_content(chunk_size=1024*1024*4):
     #        f.write(chunk)
