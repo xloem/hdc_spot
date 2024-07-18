@@ -37,7 +37,7 @@ for url in urls:
             if json[urlkey] == url:
                 sn = f'{VER}-min-{platform}-{device}'
                 print('applies to', sn, f'({fn})')
-                if os.path.exists(sn):
+                if os.path.lexists(sn):
                     os.unlink(sn)
                 os.symlink(fn, sn)
                 added.add(os.path.abspath(sn))
